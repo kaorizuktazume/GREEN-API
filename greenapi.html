@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GREEN-API Integration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .field {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, button, textarea {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        textarea {
+            resize: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GREEN-API Integration</h1>
+        <div class="field">
+            <label for="idInstance">ID Instance:</label>
+            <input type="text" id="idInstance" placeholder="Enter your ID Instance">
+        </div>
+        <div class="field">
+            <label for="apiTokenInstance">API Token Instance:</label>
+            <input type="text" id="apiTokenInstance" placeholder="Enter your API Token">
+        </div>
+        <div class="field">
+            <button id="getSettingsBtn">Get Settings</button>
+        </div>
+        <div class="field">
+            <textarea id="responseOutput" rows="10" readonly placeholder="API response will appear here..."></textarea>
+        </div>
+	<div class="field">
+    	    <button id="getStateBtn">Get State</button>
+	</div>
+	<div class="field">
+    	    <label for="phoneNumber">Recipient Phone Number:</label>
+            <input type="text" id="phoneNumber" placeholder="Enter phone number (e.g., 77012345678)">
+	</div>
+	<div class="field">
+    	    <label for="messageContent">Message:</label>
+    	    <input type="text" id="messageContent" placeholder="Enter your message">
+	</div>
+	<div class="field">
+    	    <button id="sendMessageBtn">Send Message</button>
+	</div>
+	<div class="field">
+   	    <label for="fileUrl">File URL:</label>
+    	    <input type="text" id="fileUrl" placeholder="Enter the URL of the file">
+	</div>
+	<div class="field">
+    	    <button id="sendFileBtn">Send File</button>
+	</div>
+    </div>
+</body>
+</html>
+<script>
+// Function to fetch settings from the API
+async function getSettings() {
+    // Get the values entered by the user
+    const idInstance = document.getElementById('idInstance').value;
+    const apiTokenInstance = document.getElementById('apiTokenInstance').value;
+
+    // Check if the fields are filled
+    if (!idInstance || !apiTokenInstance) {
+        alert("Please enter both ID Instance and API Token Instance.");
+        return;
+    }
+
+    // Construct the API URL
+    const apiUrl = `https://7105.api.greenapi.com/waInstance${idInstance}/getSettings/${apiTokenInstance}`;
+
+    try {
+        // Make the API request using fetch
+        const response = await fetch(apiUrl);
+
+        // Parse the response as JSON
+        const data = await response.json();
+
+        // Display the response in the textarea
+        document.getElementById('responseOutput').value = JSON.stringify(data, null, 2);
+    } catch (error) {
+        // Handle errors
+        document.getElementById('responseOutput').value = `Error: ${error.message}`;
+    }
+}
+
+// Add an event listener to the "Get Settings" button
+document.getElementById('getSettingsBtn').addEventListener('click', getSettings);
+// Function to fetch the instance state
+async function getStateInstance() {
+    // Get the values entered by the user
+    const idInstance = document.getElementById('idInstance').value;
+    const apiTokenInstance = document.getElementById('apiTokenInstance').value;
+
+    // Check if the fields are filled
+    if (!idInstance || !apiTokenInstance) {
+        alert("Please enter both ID Instance and API Token Instance.");
+        return;
+    }
+
+    // Construct the API URL for getStateInstance
+    const apiUrl = `https://7105.api.greenapi.com/waInstance${idInstance}/getStateInstance/${apiTokenInstance}`;
+
+    try {
+        // Make the API request using fetch
+        const response = await fetch(apiUrl);
+
+        // Parse the response as JSON
+        const data = await response.json();
+
+        // Display the response in the textarea
+        document.getElementById('responseOutput').value = JSON.stringify(data, null, 2);
+    } catch (error) {
+        // Handle errors
+        document.getElementById('responseOutput').value = `Error: ${error.message}`;
+    }
+}
+
+// Add an event listener to the "Get State" button
+document.getElementById('getStateBtn').addEventListener('click', getStateInstance);
+// Function to fetch the instance state
+async function getStateInstance() {
+    // Get values from input fields
+    const idInstance = document.getElementById('idInstance').value;
+    const apiTokenInstance = document.getElementById('apiTokenInstance').value;
+
+    // Validate input fields
+    if (!idInstance || !apiTokenInstance) {
+        alert("Please enter both ID Instance and API Token Instance.");
+        return;
+    }
+
+    // Construct the API endpoint
+    const apiUrl = `https://7105.api.greenapi.com/waInstance${idInstance}/getStateInstance/${apiTokenInstance}`;
+
+    try {
+        // Fetch the state of the instance
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        // Display the response in the textarea
+        document.getElementById('responseOutput').value = JSON.stringify(data, null, 2);
+    } catch (error) {
+        // Handle potential errors
+        document.getElementById('responseOutput').value = `Error: ${error.message}`;
+    }
+}
+
+// Add an event listener to trigger the function
+document.getElementById('getStateBtn').addEventListener('click', getStateInstance);
+// Function to send a message
+async function sendMessage() {
+    // Get the values entered by the user
+    const idInstance = document.getElementById('idInstance').value;
+    const apiTokenInstance = document.getElementById('apiTokenInstance').value;
+    const phoneNumber = document.getElementById('phoneNumber').value;
+    const messageContent = document.getElementById('messageContent').value;
+
+    // Check if the fields are filled
+    if (!idInstance || !apiTokenInstance || !phoneNumber || !messageContent) {
+        alert("Please fill in all fields.");
+        return;
+    }
+
+    // Construct the API URL
+    const apiUrl = `https://7105.api.greenapi.com/waInstance${idInstance}/sendMessage/${apiTokenInstance}`;
+
+    // Create the payload for the POST request
+    const payload = {
+        chatId: `${phoneNumber}@c.us`, // WhatsApp ID of the recipient
+        message: messageContent       // Message content
+    };
+
+    try {
+        // Make the POST request using fetch
+        const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        // Parse the response as JSON
+        const data = await response.json();
+
+        // Display the response in the textarea
+        document.getElementById('responseOutput').value = JSON.stringify(data, null, 2);
+    } catch (error) {
+        // Handle errors
+        document.getElementById('responseOutput').value = `Error: ${error.message}`;
+    }
+}
+
+// Add an event listener to the "Send Message" button
+document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
+// Function to send a file by URL
+async function sendFileByUrl() {
+    // Get the values entered by the user
+    const idInstance = document.getElementById('idInstance').value;
+    const apiTokenInstance = document.getElementById('apiTokenInstance').value;
+    const phoneNumber = document.getElementById('phoneNumber').value;
+    const fileUrl = document.getElementById('fileUrl').value;
+
+    // Check if all fields are filled
+    if (!idInstance || !apiTokenInstance || !phoneNumber || !fileUrl) {
+        alert("Please fill in all fields.");
+        return;
+    }
+
+    // Construct the API URL
+    const apiUrl = `https://7105.api.greenapi.com/waInstance${idInstance}/sendFileByUrl/${apiTokenInstance}`;
+
+    // Create the payload for the POST request
+    const payload = {
+        chatId: `${phoneNumber}@c.us`, // WhatsApp ID of the recipient
+        urlFile: fileUrl,             // URL of the file to send
+        fileName: "MyFile"            // Optional file name
+    };
+
+    try {
+        // Make the POST request using fetch
+        const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        // Parse the response as JSON
+        const data = await response.json();
+
+        // Display the response in the textarea
+        document.getElementById('responseOutput').value = JSON.stringify(data, null, 2);
+    } catch (error) {
+        // Handle errors
+        document.getElementById('responseOutput').value = `Error: ${error.message}`;
+    }
+}
+
+// Add an event listener to the "Send File" button
+document.getElementById('sendFileBtn').addEventListener('click', sendFileByUrl);
+</script>
